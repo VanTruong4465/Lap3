@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, ActivityIndicator, SafeAreaView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, ActivityIndicator, SafeAreaView, Image } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth'; // Import Firebase Authentication
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -10,6 +10,8 @@ export default function Register({ navigation }) {
     const [repassword, setRepassword] = useState('');
     const [name, setName] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showResetPassword, setShowResetPassword] = useState(false);
 
     const isValidEmail = (email) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -61,16 +63,26 @@ export default function Register({ navigation }) {
             setLoading(false);
         }
     };
-
+    const toggleShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
+    const toggleResetShowPassword = () => {
+        setShowResetPassword(!showResetPassword);
+    };
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#e8ecf4' }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+
             <KeyboardAwareScrollView
                 contentContainerStyle={{ flexGrow: 1 }}
                 keyboardShouldPersistTaps="handled">
                 <View style={styles.container}>
                     <View style={styles.header}>
+                        <Image
+                            resizeMode="contain"
+                            style={styles.headerImg}
+                            source={require('../../image/logo1.png')} />
                         <Text style={styles.title}>
-                            Đăng kí <Text style={{ color: '#FFC0CB' }}>MySpaApp</Text>
+                            <Text style={{ color: '#FFC0CB', fontSize: 50 }}>Đăng Ký</Text>
                         </Text>
                     </View>
 
@@ -98,8 +110,11 @@ export default function Register({ navigation }) {
                                 placeholder="********"
                                 placeholderTextColor="#6b7280"
                                 style={styles.inputControl}
-                                secureTextEntry={true}
+                                secureTextEntry={!showPassword}
                                 value={password} />
+                            <TouchableOpacity onPress={toggleShowPassword} style={styles.passwordToggle}>
+                                <Text style={styles.eyeIcon}>{showPassword ? '👁️' : '👁️'}</Text>
+                            </TouchableOpacity>
                         </View>
 
                         <View style={styles.input}>
@@ -111,8 +126,11 @@ export default function Register({ navigation }) {
                                 placeholder="********"
                                 placeholderTextColor="#6b7280"
                                 style={styles.inputControl}
-                                secureTextEntry={true}
+                                secureTextEntry={!showResetPassword}
                                 value={repassword} />
+                            <TouchableOpacity onPress={toggleResetShowPassword} style={styles.passwordToggle}>
+                                <Text style={styles.eyeIcon}>{showResetPassword ? '👁️' : '👁️'}</Text>
+                            </TouchableOpacity>
                         </View>
 
                         <View style={styles.input}>
@@ -139,13 +157,9 @@ export default function Register({ navigation }) {
                         </TouchableOpacity>
 
                         <TouchableOpacity onPress={() => navigation.goBack()} disabled={loading}>
-                            <View style={[styles.btn, { backgroundColor: 'blue' }]}>
-                                {loading ? (
-                                    <ActivityIndicator color="#fff" />
-                                ) : (
-                                    <Text style={styles.btnText}>Quay lại</Text>
-                                )}
-                            </View>
+
+                            <Text style={{ color: 'blue', textAlign: 'center', marginTop: 5, fontSize: 20 }}>Quay lại</Text>
+
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -159,7 +173,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 24,
         paddingHorizontal: 0,
-        backgroundColor: '#e8ecf4',
+        backgroundColor: 'white',
     },
     title: {
         fontSize: 31,
@@ -174,10 +188,10 @@ const styles = StyleSheet.create({
         marginVertical: 36,
     },
     headerImg: {
-        width: 80,
-        height: 80,
+        width: 500,
+        height: 150,
         alignSelf: 'center',
-        marginBottom: 36,
+        marginTop: -30
     },
     /** Form */
     form: {
@@ -219,8 +233,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#C9D3DB',
         borderStyle: 'solid',
+        flex: 1,
     },
-    /** Button */
     btn: {
         marginTop: 10,
         flexDirection: 'row',
@@ -230,13 +244,29 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderWidth: 1,
-        backgroundColor: '#FFC0CB',
-        borderColor: '#075eec',
+        backgroundColor: 'black',
+
     },
     btnText: {
         fontSize: 18,
         lineHeight: 26,
         fontWeight: '600',
         color: '#fff',
+    },
+    passwordContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        position: 'relative',
+
+    },
+    passwordToggle: {
+        position: 'absolute',
+        right: 12,
+        top: 12,
+        marginTop: 30
+    },
+    eyeIcon: {
+        fontSize: 22,
+        color: '#6b7280',
     },
 });

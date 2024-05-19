@@ -34,12 +34,12 @@ const Booking = ({ route }) => {
         }
     };
 
-    // Function to format bookingDate to YYYY-MM-DD format
     const formatBookingDate = (date) => {
-        // Split the date string into day, month, and year
         const [day, month, year] = date.split('-');
-        // Join day, month, and year with '-' separator to form YYYY-MM-DD format
         return `${year}-${month}-${day}`;
+    };
+    const formatPrice = (price) => {
+        return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ' VND';
     };
 
     return (
@@ -48,12 +48,12 @@ const Booking = ({ route }) => {
                 <Icon name="arrow-left" size={24} color="black" />
             </TouchableOpacity>
             <Text style={styles.text}>Service Name: {serviceName}</Text>
-            <Text style={styles.text}>Prices: {prices}</Text>
+            <Text style={styles.text}>Prices: {formatPrice(prices)}</Text>
             {imageUrl && <Image source={{ uri: imageUrl }} style={styles.image} />}
 
             <TextInput
                 style={styles.input}
-                placeholder="Nhập ngày-tháng-năm"
+                placeholder="Nhập MM/dd/yyyy"
                 value={bookingDate}
                 onChangeText={setBookingDate}
             />
@@ -86,13 +86,14 @@ const styles = StyleSheet.create({
         width: 200,
         height: 200,
         marginTop: 20,
+        borderRadius: 10
     },
     input: {
         width: '100%',
         padding: 10,
         borderWidth: 1,
         borderColor: '#ccc',
-        borderRadius: 5,
+        borderRadius: 10,
         marginTop: 20,
     },
     backButton: {
@@ -101,7 +102,7 @@ const styles = StyleSheet.create({
         left: 10,
     },
     addButton: {
-        backgroundColor: 'pink',
+        backgroundColor: 'black',
         borderRadius: 10,
         height: 40,
         justifyContent: 'center',

@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, FlatList } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
-import ProfileCustomer from './ProfileCustomer'
+import ProfileCustomer from './ProfileCustomer';
 import firestore from '@react-native-firebase/firestore';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import Details from './Details'
+import Details from './Details';
+import HeaderCustomer from './HeaderCustomer';
 
 const Stack = createStackNavigator();
 
-const HomeScreenCustomer = ({ navigation, route }) => {
+const HomeScreenCustomer = ({ navigation }) => {
     const [services, setServices] = useState([]);
+    const [filteredServices, setFilteredServices] = useState([]);
     const [username, setUsername] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         const fetchServices = async () => {
@@ -18,6 +21,7 @@ const HomeScreenCustomer = ({ navigation, route }) => {
                 const servicesSnapshot = await firestore().collection('services').get();
                 const servicesData = servicesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 setServices(servicesData);
+                setFilteredServices(servicesData);
             } catch (error) {
                 console.error('Error fetching services:', error);
             }
@@ -46,45 +50,52 @@ const HomeScreenCustomer = ({ navigation, route }) => {
         return unsubscribe;
     }, [navigation]);
 
+    useEffect(() => {
+        if (searchQuery) {
+            const filtered = services.filter(service =>
+                service.service.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+            setFilteredServices(filtered);
+        } else {
+            setFilteredServices(services);
+        }
+    }, [searchQuery, services]);
 
     const handleServicePress = (service) => {
         navigation.navigate('Details', { service });
     };
 
+    const formatPrice = (price) => {
+        return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ' VND';
+    };
+
     const renderItem = ({ item, index }) => (
-        <TouchableOpacity style={styles.input} onPress={() => handleServicePress(item)}>
+        <TouchableOpacity style={styles.card} onPress={() => handleServicePress(item)}>
             <View style={styles.itemContainer}>
-                <Text>{`${index + 1}. ${item.service}`}</Text>
-                <Text>{item.prices}</Text>
+                <Text style={styles.itemText}>{`${index + 1}. ${item.service}`}</Text>
+                <Text style={styles.itemText}>{formatPrice(item.prices)}</Text>
             </View>
         </TouchableOpacity>
     );
 
     return (
         <View style={styles.container}>
-            {/* Upper View */}
-            <View style={styles.upperView}>
-                {/* Username */}
-                <Text style={styles.username}>{username}</Text>
-                {/* Profile icon */}
-                <TouchableOpacity onPress={() => navigation.navigate('ProfileCustomer')}>
-                    <View style={styles.iconContainer}>
-                        <Icon name="user" size={25} color="black" />
-                    </View>
-                </TouchableOpacity>
-            </View>
+            <HeaderCustomer navigation={navigation} />
 
-            {/* Content */}
+            <TextInput
+                style={styles.searchBar}
+                placeholder="Tìm kiếm ..."
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+            />
+
             <View style={styles.contentContainer}>
-
-
                 <View style={styles.header}>
                     <Text style={styles.headerText}>DANH SÁCH DỊCH VỤ</Text>
-
                 </View>
 
                 <FlatList
-                    data={services}
+                    data={filteredServices}
                     renderItem={renderItem}
                     keyExtractor={item => String(item.id)}
                     style={styles.list}
@@ -104,7 +115,6 @@ const HomeCustomer = ({ route }) => {
             />
             <Stack.Screen name="ProfileCustomer" component={ProfileCustomer} />
             <Stack.Screen name="Details" component={Details} />
-
         </Stack.Navigator>
     );
 };
@@ -112,28 +122,44 @@ const HomeCustomer = ({ route }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: 'white',
     },
     upperView: {
         flexDirection: 'row',
-        backgroundColor: 'white',
         paddingVertical: 10,
         paddingHorizontal: 20,
         backgroundColor: '#FFC0CB',
         alignItems: 'center',
     },
+    searchBar: {
+        height: 40,
+        borderColor: '#ccc',
+        borderWidth: 1,
+        borderRadius: 30,
+        margin: 10,
+        paddingLeft: 10,
+    },
     contentContainer: {
         flex: 1,
         padding: 20,
     },
-    input: {
-        height: 40,
-        width: 350,
-        borderColor: 'black',
-        borderWidth: 1,
-        marginBottom: 10,
-        paddingHorizontal: 10,
-        borderRadius: 10,
-        paddingTop: 10
+    card: {
+        backgroundColor: '#87cefa',
+        borderRadius: 30,
+        padding: 15,
+        marginBottom: 15,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    itemContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    itemText: {
+        fontSize: 16,
     },
     logoContainer: {
         justifyContent: 'center',
@@ -146,10 +172,8 @@ const styles = StyleSheet.create({
     headerText: {
         flex: 1,
         fontSize: 30,
-        alignContent: 'center',
-        justifyContent: 'center',
         textAlign: 'center',
-        color: 'black'
+        color: 'black',
     },
     addButton: {
         backgroundColor: 'pink',
@@ -164,21 +188,18 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: 'white',
     },
-    itemContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
     username: {
         marginRight: 'auto',
         marginLeft: 10,
+        fontSize: 18,
+        fontWeight: 'bold',
     },
     iconContainer: {
         padding: 5,
     },
     list: {
         paddingTop: 20,
-
-    }
+    },
 });
 
 export default HomeCustomer;

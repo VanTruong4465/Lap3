@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import firestore from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth'; // Import Firebase Authentication
+import auth from '@react-native-firebase/auth';
 import {
     StyleSheet,
     SafeAreaView,
@@ -17,9 +17,9 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 export default function Login({ navigation }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false); // Biến state để theo dõi trạng thái hiển thị của mật khẩu
     const [loading, setLoading] = useState(false);
 
-    // Check email format
     const isValidEmail = (email) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
@@ -38,17 +38,12 @@ export default function Login({ navigation }) {
 
         setLoading(true);
         try {
-            // Sign in with Firebase Authentication
             const userCredential = await auth().signInWithEmailAndPassword(email, password);
-
-            // Get user document from Firestore
             const uid = userCredential.user.uid;
             const userDoc = await firestore().collection('user').doc(uid).get();
 
             if (userDoc.exists) {
                 const userData = userDoc.data();
-
-                // Check user role and navigate accordingly
                 if (userData.role === 'admin') {
                     console.log('Successful admin login');
                     navigation.navigate('Tab', { userName: email });
@@ -71,6 +66,10 @@ export default function Login({ navigation }) {
         navigation.navigate('Register');
     };
 
+    const toggleShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#e8ecf4' }}>
             <KeyboardAwareScrollView
@@ -81,9 +80,9 @@ export default function Login({ navigation }) {
                         <Image
                             resizeMode="contain"
                             style={styles.headerImg}
-                            source={require('../../image/Malisa.png')} />
+                            source={require('../../image/logo1.png')} />
                         <Text style={styles.title}>
-                            Welcome <Text style={{ color: '#FFC0CB' }}>MySpaApp</Text>
+                            <Text style={{ color: '#FFC0CB', fontSize: 50 }}>Đăng Nhập</Text>
                         </Text>
                     </View>
 
@@ -104,15 +103,21 @@ export default function Login({ navigation }) {
 
                         <View style={styles.input}>
                             <Text style={styles.inputLabel}>Mật khẩu</Text>
-                            <TextInput
-                                autoCorrect={false}
-                                clearButtonMode="while-editing"
-                                onChangeText={setPassword}
-                                placeholder="********"
-                                placeholderTextColor="#6b7280"
-                                style={styles.inputControl}
-                                secureTextEntry={true}
-                                value={password} />
+                            <View style={styles.passwordContainer}>
+                                <TextInput
+                                    autoCorrect={false}
+                                    clearButtonMode="while-editing"
+                                    onChangeText={setPassword}
+                                    placeholder="********"
+                                    placeholderTextColor="#6b7280"
+                                    style={styles.inputControl}
+                                    secureTextEntry={!showPassword}
+                                    value={password}
+                                />
+                                <TouchableOpacity onPress={toggleShowPassword} style={styles.passwordToggle}>
+                                    <Text style={styles.eyeIcon}>{showPassword ? '👁️' : '👁️'}</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
 
                         <TouchableOpacity onPress={checkCredentials} disabled={loading}>
@@ -147,7 +152,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 24,
         paddingHorizontal: 0,
-        backgroundColor: '#e8ecf4',
+        backgroundColor: 'white',
     },
     title: {
         fontSize: 31,
@@ -155,7 +160,6 @@ const styles = StyleSheet.create({
         color: '#FFC0CB',
         marginBottom: 6,
     },
-    /** Header */
     header: {
         alignItems: 'center',
         justifyContent: 'center',
@@ -163,11 +167,10 @@ const styles = StyleSheet.create({
     },
     headerImg: {
         width: 500,
-        height: 100,
+        height: 200,
         alignSelf: 'center',
-        marginBottom: 36,
+
     },
-    /** Form */
     form: {
         marginBottom: 24,
         paddingHorizontal: 24,
@@ -186,7 +189,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         letterSpacing: 0.15,
     },
-    /** Input */
     input: {
         marginBottom: 16,
     },
@@ -207,8 +209,22 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#C9D3DB',
         borderStyle: 'solid',
+        flex: 1,
     },
-    /** Button */
+    passwordContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        position: 'relative',
+    },
+    passwordToggle: {
+        position: 'absolute',
+        right: 12,
+        top: 12,
+    },
+    eyeIcon: {
+        fontSize: 22,
+        color: '#6b7280',
+    },
     btn: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -217,8 +233,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderWidth: 1,
-        backgroundColor: '#FFC0CB',
-        borderColor: '#075eec',
+        backgroundColor: 'black',
     },
     btnText: {
         fontSize: 18,
@@ -227,3 +242,4 @@ const styles = StyleSheet.create({
         color: '#fff',
     },
 });
+

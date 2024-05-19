@@ -110,9 +110,10 @@ const AddNewServices = ({ navigation }) => {
                     keyboardType="number-pad"
                 />
 
-                <TouchableOpacity onPress={pickImage} style={styles.button}>
-                    <Text style={{ fontSize: 20, color: 'white' }}>Chọn ảnh</Text>
+                <TouchableOpacity onPress={pickImage} >
+                    <Text style={{ fontSize: 15, color: 'blue', textAlign: 'center' }}>Chọn ảnh</Text>
                 </TouchableOpacity>
+
 
                 {imageUri && (
                     <Image source={{ uri: imageUri }} style={styles.imagePreview} />
@@ -162,8 +163,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         borderWidth: 1,
         height: 45,
-        backgroundColor: '#FFC0CB',
-        borderColor: '#075eec',
+        backgroundColor: 'black',
+
         marginTop: 10,
     },
     buttonsContainer: {

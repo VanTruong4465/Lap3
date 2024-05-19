@@ -17,7 +17,9 @@ const DetailsScreen = ({ route, navigation }) => {
             imageUrl: service.imageUrl,
         });
     };
-
+    const formatPrice = (price) => {
+        return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ' VND';
+    };
     return (
         <View style={styles.container}>
             <View style={styles.topContainer}>
@@ -40,7 +42,7 @@ const DetailsScreen = ({ route, navigation }) => {
                 <View style={styles.section}>
                     <Text style={styles.label}>Giá:</Text>
                     <View style={styles.inputContainer}>
-                        <Text style={styles.input}>{service.prices}</Text>
+                        <Text style={styles.input}>{formatPrice(service.prices)}</Text>
                     </View>
                 </View>
             </View>
@@ -69,6 +71,7 @@ const styles = StyleSheet.create({
         flex: 1,
         marginTop: 10,
         padding: 20,
+        backgroundColor: 'white'
     },
     topContainer: {
         flexDirection: 'row',
@@ -96,7 +99,7 @@ const styles = StyleSheet.create({
     inputContainer: {
         flex: 1,
         borderWidth: 1,
-        borderColor: '#ddd',
+        borderColor: 'white',
         borderRadius: 5,
         padding: 5,
         marginLeft: 10,
@@ -112,7 +115,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
     },
     addButton: {
-        backgroundColor: 'pink',
+        backgroundColor: 'black',
         borderRadius: 10,
         height: 40,
         justifyContent: 'center',

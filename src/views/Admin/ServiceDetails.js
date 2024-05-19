@@ -84,7 +84,9 @@ const ServiceDetails = ({ route, navigation }) => {
             Alert.alert('Thông báo', 'Xoá không thành công');
         }
     };
-
+    const formatPrice = (price) => {
+        return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ' VND';
+    };
     return (
         <View style={styles.container}>
             <View style={styles.topContainer}>
@@ -123,7 +125,7 @@ const ServiceDetails = ({ route, navigation }) => {
                     <View style={styles.inputContainer}>
                         <TextInput
                             style={styles.input}
-                            value={updatedPrices}
+                            value={formatPrice(updatedPrices)}
                             onChangeText={setUpdatedPrices}
                             placeholder="Giá"
                             keyboardType="numeric"
